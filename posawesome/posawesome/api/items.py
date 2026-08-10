@@ -248,7 +248,7 @@ def _normalize_item_sales_doctype_filter(value):
     return "All"
 
 
-def _item_sales_source_sql(doctype, item_code, company, search, from_date, to_date):
+def _item_sales_source_sql(     doctype,     item_code,     company,     customer,     search,     from_date,     to_date, ):
     child_doctype = "POS Invoice Item" if doctype == "POS Invoice" else "Sales Invoice Item"
     conditions = [
         "inv.docstatus = 1",
@@ -257,7 +257,9 @@ def _item_sales_source_sql(doctype, item_code, company, search, from_date, to_da
         "item.item_code = %s",
     ]
     params = [company, item_code]
-
+    if customer:
+        conditions.append("inv.customer = %s")
+        params.append(customer)
     if from_date:
         conditions.append("inv.posting_date >= %s")
         params.append(from_date)
@@ -339,7 +341,10 @@ def get_item_sales_history(
     limit_start = max(cint(limit_start), 0)
     limit_page_length = max(1, min(cint(limit_page_length) or 25, 100))
     search = (search or "").strip()
+    customer = (customer or "").strip()
 
+    if not customer:
+        frappe.throw(_("Customer is required for item sales history."))
     for doctype in doctypes:
         assert_doctype_read_permission(doctype)
 
@@ -350,6 +355,7 @@ def get_item_sales_history(
             doctype,
             item_code,
             company,
+			customer,
             search,
             from_date,
             to_date,
