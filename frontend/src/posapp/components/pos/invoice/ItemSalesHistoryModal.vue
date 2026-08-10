@@ -521,6 +521,7 @@ const loadHistory = async () => {
 				item_code: props.item.item_code,
 				company: props.posProfile.company,
 				pos_profile: props.posProfile.name,
+				customer: props.invoiceDoc?.customer || "",
 				doctype_filter: filters.value.doctype_filter,
 				search: filters.value.search,
 				from_date: filters.value.from_date,
